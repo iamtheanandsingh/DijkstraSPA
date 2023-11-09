@@ -1,13 +1,19 @@
-//Essential Header Files
 #include <iostream>
-#include <queue>
+#include <fstream>
 
 using namespace std;
 
+int readBench() {
+    ifstream inputBench;
+    inputBench.open("c17.bench");
+    if(inputBench.fail()) {
+        cout<<"Wrong File Name Lil Nigga";
+    }
+    return 0;
+}
 
-//Main Funtion
 int main()
 {
-    
+    int a
     return 0;
 }
