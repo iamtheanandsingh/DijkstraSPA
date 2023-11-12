@@ -13,7 +13,7 @@ int main() {
     ifstream bench;
 
     //Taking in the input, output and filename
-    cin>>input>>output>>filename;
+    cin>>filename>>input>>output;
 
     //Opening the file
     bench.open(filename);
