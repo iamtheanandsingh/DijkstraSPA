@@ -8,6 +8,7 @@
 
 using namespace std;
 
+//Type of Node We Come Across, Is it an Input, Output, or Intermediate.
 struct nodeType {
     const int INPUT;
     const int OUTPUT;
@@ -52,25 +53,33 @@ list<string> getPath(map<string, string> &penultimate, string destination) {
     return path;
 }
 
+Node* findGateNode(vector<ptr<Node>> &nodes, string nodeName) {
+    for (auto &node : nodes) {
+        if (node->name == nodeName) {
+            return node;
+        }
+    }
+    return nullptr;
+}
+
+//Declaring BenchFiles Globally
+vector<string> benchFiles = { 
+    "c17.bench", "c432.bench", "c499.bench", "c880.bench",
+    "c1355.bench", "c1908.bench", "c2670.bench", "c3540.bench", 
+    "c5315.bench", "c6288.bench", "c7552.bench" 
+};
+
 int main() {
-    //Declaring BenchFiles Globally
-    vector<string> benchFiles = { 
-        "c17.bench", "c432.bench", "c499.bench", "c880.bench",
-        "c1355.bench", "c1908.bench", "c2670.bench", "c3540.bench", 
-        "c5315.bench", "c6288.bench", "c7552.bench" 
-    };
-    
     //Declaring the variables
     string input, output, filename;
 
     //Taking in the input, output and filename
     cin>>filename>>input>>output;
     
-    //be
+    //Benchfile Checking
     ifstream bench;
     if(find(benchFiles.begin(), benchFiles.end(), filename) == benchFiles.end()) {
-        cout<<"Wrong file name";
-        exit(0);
+        
     }
 
     return 0;
