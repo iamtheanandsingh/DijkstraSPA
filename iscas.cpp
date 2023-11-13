@@ -17,7 +17,7 @@ int main() {
 
     //Opening the file
     bench.open(filename);
-    
+    bench
     //Checking if the filename is an actual Benchfile or not
     if(bench.fail()) {
         cout<<"Wrong file name";
