@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.rmd": "markdown",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "vector": "cpp"
     }
 }
