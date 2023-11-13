@@ -2,19 +2,19 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <sstream>
 
-// Define a structure to represent a logic gate
+using namespace std;
+
 struct LogicGate {
-    std::string type;           // Gate type (e.g., AND, OR, NOT)
-    std::string output;         // Output signal name
-    std::vector<std::string> inputs; // Input signal names
+    std::string type;
+    std::string output;
+    std::vector<std::string> inputs;
 };
 
 int main() {
     std::string filename = "c17.bench"; // Replace with the actual .bench file name
     std::ifstream file(filename);
-
-    file.open();
 
     if (!file.is_open()) {
         std::cerr << "Unable to open the file: " << filename << std::endl;
@@ -22,19 +22,25 @@ int main() {
     }
 
     std::vector<LogicGate> logicGates;
-
     std::string line;
-    while (std::getline(file, line)) {
-        // Parse and process each line according to the .bench file format
-        // This code assumes a simple example format - you need to adapt it
-        // to your specific .bench file format.
 
-        // Example: Assume .bench format is "output = AND(input1, input2)"
+    while (std::getline(file, line)) {
+        // Skip comment lines (lines starting with '#')
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+
         LogicGate gate;
-        gate.type = "AND"; // Parse the gate type from the line
-        gate.output = "output"; // Parse the output signal name
-        gate.inputs.push_back("input1"); // Parse the input signals
-        gate.inputs.push_back("input2");
+        std::stringstream lineStream(line);
+        std::string token;
+
+        lineStream >> gate.output; // The first token is the output signal
+        lineStream >> gate.type;   // The second token is the gate type
+
+        while (lineStream >> token) {
+            // Additional tokens are input signals
+            gate.inputs.push_back(token);
+        }
 
         logicGates.push_back(gate);
     }
