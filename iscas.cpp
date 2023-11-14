@@ -69,18 +69,22 @@ vector<string> benchFiles = {
     "c5315.bench", "c6288.bench", "c7552.bench" 
 };
 
-int main() {
+int main(int argc, char* argv[]) {
     //Declaring the variables
     string input, output, filename;
 
     //Taking in the input, output and filename
     cin>>filename>>input>>output;
-    
+
+    if(argc != 3) {
+        cout<<"Incorrect number of arguments";
+        exit(0);
+    }
+
     //Benchfile Checking
     ifstream bench;
     if(find(benchFiles.begin(), benchFiles.end(), filename) == benchFiles.end()) {
-        
+        cout<<"Wrong file name"
     }
-
     return 0;
 }

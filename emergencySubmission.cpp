@@ -20,12 +20,12 @@ public:
 
     class GateNode {
     public:
-        std::string type;
-        std::list<GateNode*> adjacencyList;
+        string type;
+        list<GateNode*> adjacencyList;
         int gateDelay;
-        std::string name;
+        string name;
 
-        GateNode(std::string type, std::list<GateNode*> adjacencyList, int gateDelay, std::string name) :
+        GateNode(string type, list<GateNode*> adjacencyList, int gateDelay, string name) :
             type(type), adjacencyList(adjacencyList), gateDelay(gateDelay), name(name) {}
 
         ~GateNode() {
@@ -43,8 +43,8 @@ public:
         Pair(GateNode* gate, int delayWeight) : gate(gate), delayWeight(delayWeight) {}
     };
 
-    static std::list<std::string> getPath(std::map<std::string, std::string>& predecessors, std::string destination) {
-        std::list<std::string> path;
+    static list<string> getPath(map<string, string>& predecessors, string destination) {
+        list<string> path;
         while (!destination.empty()) {
             path.push_back(destination);
             destination = predecessors[destination];
@@ -53,7 +53,7 @@ public:
         return path;
     }
 
-    static GateNode* findGateNodeByName(std::vector<std::unique_ptr<GateNode>>& nodes, std::string nodeName) {
+    static GateNode* findGateNodeByName(vector<unique_ptr<GateNode>>& nodes, string nodeName) {
         for (const auto& node : nodes) {
             if (node->name == nodeName) {
                 return node.get();
@@ -63,66 +63,66 @@ public:
     }
 };
 
-std::vector<std::string> benchFiles = { "c17.bench", "c432.bench", "c499.bench", "c880.bench", "c1355.bench",
+vector<string> benchFiles = { "c17.bench", "c432.bench", "c499.bench", "c880.bench", "c1355.bench",
                                         "c1908.bench", "c2670.bench", "c3540.bench", "c5315.bench", "c6288.bench", "c7552.bench" };
 
 int main(int argc, char* argv[]) {
 
     if (arg) {
-        std::cout << "Incorrect number of arguments" << std::endl;
+        cout << "Incorrect number of arguments" << endl;
         return 1;
     }
 
-    std::string benchFileName = argv[1];
-    if (std::find(benchFiles.begin(), benchFiles.end(), benchFileName) == benchFiles.end()) {
-        std::cout << "Wrong File Name. File does not Exist" << std::endl;
+    string benchFileName = argv[1];
+    if (find(benchFiles.begin(), benchFiles.end(), benchFileName) == benchFiles.end()) {
+        cout << "Wrong File Name. File does not Exist" << endl;
         return 1;
     }
 
     djikstraMinDelay outerInstance;
-    std::vector<std::unique_ptr<djikstraMinDelay::GateNode>> nodes;
-    std::string filePath = benchFileName;
+    vector<unique_ptr<djikstraMinDelay::GateNode>> nodes;
+    string filePath = benchFileName;
 
-    std::ifstream inputFile(filePath);
+    ifstream inputFile(filePath);
     if (!inputFile.is_open()) {
-        std::cerr << "Error opening file: " << filePath << std::endl;
+        cerr << "Error opening file: " << filePath << endl;
         return 1;
     }
 
-    std::string line;
-    while (std::getline(inputFile, line)) {
+    string line;
+    while (getline(inputFile, line)) {
         if (!line.empty()) {
             if (line[0] == '#') {
                 continue;
             }
-            if (line.find("INPUT") != std::string::npos) {
-                std::list<djikstraMinDelay::GateNode*> adjacencyList;
+            if (line.find("INPUT") != string::npos) {
+                list<djikstraMinDelay::GateNode*> adjacencyList;
                 size_t startIndex = line.find('(');
                 size_t endIndex = line.find(')');
-                std::string inputName = line.substr(startIndex + 1, endIndex - startIndex - 1);
-                auto node1 = std::make_unique<djikstraMinDelay::GateNode>("INPUT", adjacencyList, 0, inputName);
-                nodes.push_back(std::move(node1));
-            } else if (line.find("OUTPUT") != std::string::npos) {
-                std::list<djikstraMinDelay::GateNode*> adjacencyList;
+                string inputName = line.substr(startIndex + 1, endIndex - startIndex - 1);
+                auto node1 = make_unique<djikstraMinDelay::GateNode>("INPUT", adjacencyList, 0, inputName);
+                nodes.push_back(move(node1));
+            } else if (line.find("OUTPUT") != string::npos) {
+                list<djikstraMinDelay::GateNode*> adjacencyList;
                 size_t startIndex = line.find('(');
                 size_t endIndex = line.find(')');
-                std::string name = line.substr(startIndex + 1, endIndex - startIndex - 1);
-                auto node = std::make_unique<djikstraMinDelay::GateNode>("OUTPUT", adjacencyList, 0, name);
-                nodes.push_back(std::move(node));
+                string name = line.substr(startIndex + 1, endIndex - startIndex - 1);
+                auto node = make_unique<djikstraMinDelay::GateNode>("OUTPUT", adjacencyList, 0, name);
+                nodes.push_back(move(node));
             } else {
-                std::list<djikstraMinDelay::GateNode*> adjacencyList;
-                std::string input = line;
-                std::string innerString = " = ";
+                list<djikstraMinDelay::GateNode*> adjacencyList;
+                string input = line;
+                string innerString = " = ";
                 size_t index = input.find(innerString);
 
-                std::string intermediateGateName = input.substr(0, index);
-                std::string inputString = input.substr(index + innerString.length());
+                string intermediateGateName = input.substr(0, index);
+                string inputString = input.substr(index + innerString.length());
 
                 djikstraMinDelay::GateNode* node;
                 djikstraMinDelay::GateNode* currIntNode = djikstraMinDelay::findGateNodeByName(nodes, intermediateGateName);
                 if (currIntNode == nullptr) {
                     node = new djikstraMinDelay::GateNode("INTERMEDIATE", adjacencyList, 0, intermediateGateName);
-                    nodes.push_back(std::unique_ptr<djikstraMinDelay::GateNode>(node));
+                    nodes.push_back(unique_ptr<djikstraMinDelay::GateNode>(node));
                 } else {
                     node = currIntNode;
                 }
@@ -130,13 +130,13 @@ int main(int argc, char* argv[]) {
                 size_t startIndex = inputString.find('(');
                 size_t endIndex = inputString.find(')');
 
-                if (startIndex != std::string::npos && endIndex != std::string::npos && startIndex < endIndex) {
-                    std::string contentInsideBrackets = inputString.substr(startIndex + 1, endIndex - startIndex - 1);
-                    std::replace(contentInsideBrackets.begin(), contentInsideBrackets.end(), ',', ' ');
+                if (startIndex != string::npos && endIndex != string::npos && startIndex < endIndex) {
+                    string contentInsideBrackets = inputString.substr(startIndex + 1, endIndex - startIndex - 1);
+                    replace(contentInsideBrackets.begin(), contentInsideBrackets.end(), ',', ' ');
 
-                    std::istringstream iss(contentInsideBrackets);
-                    std::vector<std::string> intermediateInputGates{ std::istream_iterator<std::string>{iss},
-                                                                    std::istream_iterator<std::string>{} };
+                    istringstream iss(contentInsideBrackets);
+                    vector<string> intermediateInputGates{ istream_iterator<string>{iss},
+                                                                    istream_iterator<string>{} };
 
                     for (const auto& gates : intermediateInputGates) {
                         djikstraMinDelay::GateNode* targetNode = djikstraMinDelay::findGateNodeByName(nodes, gates);
@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
-            std::cout << line << std::endl;
+            cout << line << endl;
         }
     }
 
@@ -162,34 +162,34 @@ int main(int argc, char* argv[]) {
     djikstraMinDelay::GateNode* destinationGate = djikstraMinDelay::findGateNodeByName(nodes, argv[3]);
 
     if (sourceGate == nullptr) {
-        std::cout << "Input Signal not found in " << benchFileName << " file." << std::endl;
+        cout << "Input Signal not found in " << benchFileName << " file." << endl;
         return 1;
     } else {
         if (sourceGate->type != "INPUT") {
-            std::cout << "Signal " << argv[2] << " is not an input signal" << std::endl;
+            cout << "Signal " << argv[2] << " is not an input signal" << endl;
             return 1;
         }
     }
 
     if (destinationGate == nullptr) {
-        std::cout << "Output Signal not found in " << benchFileName << " file." << std::endl;
+        cout << "Output Signal not found in " << benchFileName << " file." << endl;
         return 1;
     } else {
         if (destinationGate->type != "OUTPUT") {
-            std::cout << "Signal " << argv[3] << " is not an output signal" << std::endl;
+            cout << "Signal " << argv[3] << " is not an output signal" << endl;
             return 1;
         }
     }
 
     // Djikstra Algorithm
-    std::map<std::string, int> delayDistance;
-    std::map<std::string, std::string> predecessors;
+    map<string, int> delayDistance;
+    map<string, string> predecessors;
     for (const auto& vertex : nodes) {
-        delayDistance[vertex->name] = std::numeric_limits<int>::max();
+        delayDistance[vertex->name] = numeric_limits<int>::max();
         predecessors[vertex->name] = "";
     }
 
-    std::priority_queue<djikstraMinDelay::Pair, std::vector<djikstraMinDelay::Pair>, std::function<bool(djikstraMinDelay::Pair, djikstraMinDelay::Pair)>> minHeap(
+    priority_queue<djikstraMinDelay::Pair, vector<djikstraMinDelay::Pair>, function<bool(djikstraMinDelay::Pair, djikstraMinDelay::Pair)>> minHeap(
         [](djikstraMinDelay::Pair p1, djikstraMinDelay::Pair p2) {
             return p1.delayWeight > p2.delayWeight;
         }
@@ -218,16 +218,16 @@ int main(int argc, char* argv[]) {
 
     // Delay from Source to every other Node
     for (const auto& entry : delayDistance) {
-        std::string vertex = entry.first;
+        string vertex = entry.first;
         int delay = entry.second;
-        std::cout << "Gate: " << vertex << ", Delay: " << delay << std::endl;
+        cout << "Gate: " << vertex << ", Delay: " << delay << endl;
     }
 
-    std::list<std::string> path = djikstraMinDelay::getPath(predecessors, "G23gat");
+    list<string> path = djikstraMinDelay::getPath(predecessors, "G23gat");
     for (const auto& vertex : path) {
-        std::cout << vertex << " ";
+        cout << vertex << " ";
     }
-    std::cout << std::endl;
+    cout << endl;
 
     return 0;
 }
