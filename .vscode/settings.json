@@ -2,6 +2,7 @@
     "files.associations": {
         "*.rmd": "markdown",
         "xstring": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "string": "cpp"
     }
 }
