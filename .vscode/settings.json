@@ -6,6 +6,7 @@
         "string": "cpp",
         "limits": "cpp",
         "queue": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "iostream": "cpp"
     }
 }

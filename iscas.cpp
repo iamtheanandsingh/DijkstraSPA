@@ -46,7 +46,9 @@ struct pairNode {
 };
 
 list<string> getPath(map<string, string>& penultimate, string destination) {
-    list<string> path;
+    
+    //Create a List to Store the path.
+    list<string> path; 
     while (!destination.empty()) {
         path.push_front(destination);
         destination = penultimate[destination];
@@ -224,15 +226,18 @@ int main(int argc, char* argv[]) {
 
     dijkstraAlgorithm(nodes, sourceGate, nodeDelayDistance, pathNodes);
 
-    // Print the shortest distance from INPUT to OUTPUT
+    //Print the shortest distance from INPUT to OUTPUT
     int shortestDistance = nodeDelayDistance[findGateNode(nodes, outputN)->name];
     cout << "Shortest Distance from " << inputN << " to " << outputN << ": " << shortestDistance << endl;
 
     //Print the path from INPUT to OUTPUT
     list<string> path = getPath(pathNodes, findGateNode(nodes, outputN)->name);
-    cout << "Path: ";
-    for (const auto& vertex : path) {
-        cout << vertex << "-> ";
+    cout << "Path Traversed: ";
+    for (auto it = path.begin(); it != path.end(); ++it) {
+        cout << *it;
+        if (next(it) != path.end()) {
+            cout << " -> ";
+        }
     }
     cout << endl;
 
