@@ -5,7 +5,7 @@ CXX = g++
 CXXFLAGS = -std=c++11
 
 # main code file
-SRC = iscas.cpp
+SRC = dijkstraProject.cpp
 
 #executable file
 EXECUTABLE = iscas
