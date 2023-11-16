@@ -15,17 +15,12 @@ using namespace std;
 struct Node {
     string type, name;
     list<Node*> adjacencyList;
-    int delay;
+    int nodeDelay;
 
-    Node(string type, list<Node*> adjacencyList, int delay, string name) {
-        this->type = type;
-        this->adjacencyList = adjacencyList;
-        this->delay = delay;
-        this->name = name;
-    
-    }
+    Node(string type, int nodeDelay, string name) : type(type), nodeDelay(nodeDelay), name(name) {}
+
     ~Node() {
-        for (auto nextNode : adjacencyList){
+        for (auto nextNode : adjacencyList) {
             delete nextNode;
         }
     }
@@ -35,13 +30,10 @@ struct pairNode {
     Node* gate;
     int weight;
 
-    pairNode(Node* gate, int weight) {
-        this->gate = gate;
-        this->weight = weight;
-    }
+    pairNode(Node* gate, int weight) : gate(gate), weight(weight) {}
 };
 
-list<string> getPath(map<string, string> &penultimate, string destination) {
+list<string> getPath(map<string, string>& penultimate, string destination) {
     list<string> path;
     while (!destination.empty()) {
         path.push_front(destination);
@@ -50,8 +42,8 @@ list<string> getPath(map<string, string> &penultimate, string destination) {
     return path;
 }
 
-Node* findGateNode(vector<Node*> &nodes, string nodeName) {
-    for (auto &node : nodes) {
+Node* findGateNode(vector<Node*>& nodes, string nodeName) {
+    for (auto& node : nodes) {
         if (node->name == nodeName) {
             return node;
         }
@@ -60,26 +52,29 @@ Node* findGateNode(vector<Node*> &nodes, string nodeName) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc) {
-        cerr << "Incorrect number of arguments" << endl;
+
+    if (argc != 4) {
+        cerr << "Usage: " << argv[0] << " <filename> <input_signal> <output_signal>" << endl;
         return 1;
     }
 
-    string benchFileName = argv[1];
+    // Taking in the input, output, and filename
+    string filename = argv[1];
+    string inputN = argv[2];
+    string outputN = argv[3];
 
-    //Declaring BenchFiles
-    vector<string> benchFiles = { 
-        "c17.bench", "c432.bench", "c499.bench", "c880.bench", 
-        "c1355.bench", "c1908.bench", "c2670.bench", "c3540.bench", 
-        "c5315.bench", "c6288.bench", "c7552.bench" };
+    vector<string> benchFiles = {
+        "c17.bench", "c432.bench", "c499.bench", "c880.bench",
+        "c1355.bench", "c1908.bench", "c2670.bench", "c3540.bench",
+        "c5315.bench", "c6288.bench", "c7552.bench"};
 
-    if (find(benchFiles.begin(), benchFiles.end(), benchFileName) == benchFiles.end()) {
+    if (find(benchFiles.begin(), benchFiles.end(), filename) == benchFiles.end()) {
         cerr << "Wrong file name." << endl;
         return 1;
     }
 
     vector<Node*> nodes;
-    string filePath = benchFileName;
+    string filePath = filename;
 
     ifstream inputFile(filePath);
     if (!inputFile.is_open()) {
@@ -94,12 +89,12 @@ int main(int argc, char* argv[]) {
                 size_t starti = line.find('(');
                 size_t endi = line.find(')');
                 string inputName = line.substr(starti + 1, endi - starti - 1);
-                nodes.push_back(new Node("INPUT", {}, 0, inputName));
+                nodes.push_back(new Node("INPUT", 0, inputName));
             } else if (line.find("OUTPUT") != string::npos) {
                 size_t starti = line.find('(');
                 size_t endi = line.find(')');
                 string name = line.substr(starti + 1, endi - starti - 1);
-                nodes.push_back(new Node("OUTPUT", {}, 0, name));
+                nodes.push_back(new Node("OUTPUT", 0, name));
             } else {
                 string input = line;
                 string innerString = " = ";
@@ -111,7 +106,7 @@ int main(int argc, char* argv[]) {
                 Node* node;
                 Node* currIntNode = findGateNode(nodes, intermediateGateName);
                 if (currIntNode == nullptr) {
-                    node = new Node("INTERMEDIATE", {}, 0, intermediateGateName);
+                    node = new Node("INTERMEDIATE", 0, intermediateGateName);
                     nodes.push_back(node);
                 } else {
                     node = currIntNode;
@@ -125,17 +120,17 @@ int main(int argc, char* argv[]) {
                     replace(contentInsideBrackets.begin(), contentInsideBrackets.end(), ',', ' ');
 
                     istringstream iss(contentInsideBrackets);
-                    vector<string> intermediateInputGates{ istream_iterator<string>{iss},
-                                                                    istream_iterator<string>{} };
+                    vector<string> intermediateInputGates{istream_iterator<string>{iss},
+                                                         istream_iterator<string>{}};
 
                     for (const auto& gates : intermediateInputGates) {
                         Node* targetNode = findGateNode(nodes, gates);
                         if (targetNode != nullptr) {
                             targetNode->adjacencyList.push_back(node);
                             if (targetNode->type == "INPUT" || targetNode->type == "OUTPUT") {
-                                targetNode->delay = 0;
+                                targetNode->nodeDelay = 0;
                             } else {
-                                targetNode->delay = targetNode->adjacencyList.size();
+                                targetNode->nodeDelay = targetNode->adjacencyList.size();
                             }
                         }
                     }
@@ -147,83 +142,78 @@ int main(int argc, char* argv[]) {
 
     inputFile.close();
 
-    Node* sourceGate = findGateNode(nodes, argv[2]);
-    Node* destinationGate = findGateNode(nodes, argv[3]);
+    Node* sourceGate = findGateNode(nodes, inputN);
+    Node* destinationGate = findGateNode(nodes, outputN);
 
     if (sourceGate == nullptr) {
-        cout << "Input Signal not found in " << benchFileName << " file." << endl;
+        cout << "Input Signal not found in " << filename << " file." << endl;
         return 1;
-    } 
-    else {
+    } else {
         if (sourceGate->type != "INPUT") {
-            cout << "Signal " << argv[2] << " is not an input signal" << endl;
+            cout << "Signal " << inputN << " is not an input signal" << endl;
             return 1;
         }
     }
 
     if (destinationGate == nullptr) {
-        cout << "Output Signal not found in " << benchFileName << " file." << endl;
+        cout << "Output Signal not found in " << filename << " file." << endl;
         return 1;
-    } 
-    else {
+    } else {
         if (destinationGate->type != "OUTPUT") {
-            cout << "Signal " << argv[3] << " is not an output signal" << endl;
+            cout << "Signal " << outputN << " is not an output signal" << endl;
             return 1;
         }
     }
 
     // Dijkstra Algorithm
-    map<string, int> delayDistance;
+    map<string, int> nodeDelayDistance;
     map<string, string> predecessors;
     for (const auto& vertex : nodes) {
-        delayDistance[vertex->name] = numeric_limits<int>::max();
+        nodeDelayDistance[vertex->name] = numeric_limits<int>::max();
         predecessors[vertex->name] = "";
     }
 
-    priority_queue<pairNode, vector<pairNode>, function<bool(pairNode, pairNode)>> minHeap(
-        [](pairNode p1, pairNode p2) {
-            return p1.weight > p2.weight;
-        }
-    );
+    priority_queue<pairNode, vector<pairNode>, function<bool(pairNode, pairNode)>> minHeap([](pairNode p1, pairNode p2) { 
+        return p1.weight > p2.weight; 
+        });
 
-    sourceGate = findGateNode(nodes, "G2gat");
-
-    delayDistance[sourceGate->name] = 0;
+    nodeDelayDistance[sourceGate->name] = 0;
     minHeap.push(pairNode(sourceGate, 0));
 
     while (!minHeap.empty()) {
         pairNode currentNode = minHeap.top();
         minHeap.pop();
-        int dis = delayDistance[currentNode.gate->name];
+        int dis; 
+        dis = nodeDelayDistance[currentNode.gate->name];
         if (currentNode.weight > dis) {
             continue;
         }
 
         for (auto& neighbour : currentNode.gate->adjacencyList) {
-            int newDistance = dis + findGateNode(nodes, neighbour->name)->delay;
-            delayDistance[neighbour->name] = newDistance;
-            predecessors[neighbour->name] = currentNode.gate->name;
-            minHeap.push(pairNode(neighbour, newDistance));
+            int newDistance = dis + findGateNode(nodes, neighbour->name)->nodeDelay;
+            if (newDistance < nodeDelayDistance[neighbour->name]) {
+                nodeDelayDistance[neighbour->name] = newDistance;
+                predecessors[neighbour->name] = currentNode.gate->name;
+                minHeap.push(pairNode(neighbour, newDistance));
+            }
         }
-    }
+    }  
 
-    //Delay from Source to every other Node
-    for (const auto& entry : delayDistance) {
-        string vertex = entry.first;
-        int delay = entry.second;
-        cout << "Gate: " << vertex << ", Delay: " << delay << endl;
-    }
+    // Print the shortest distance from INPUT to OUTPUT
+    int shortestDistance = nodeDelayDistance[findGateNode(nodes, outputN)->name];
+    cout << "Shortest Distance from " << inputN << " to " << outputN << ": " << shortestDistance << endl;
 
-    list<string> path = getPath(predecessors, "G23gat");
+    // Print the path from INPUT to OUTPUT
+    list<string> path = getPath(predecessors, findGateNode(nodes, outputN)->name);
+    cout << "Path: ";
     for (const auto& vertex : path) {
         cout << vertex << " ";
     }
     cout << endl;
 
     // Clean up dynamically allocated memory
-    for (auto node : nodes) {
+    for (auto& node : nodes) {
         delete node;
     }
-
     return 0;
 }

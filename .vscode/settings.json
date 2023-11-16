@@ -3,6 +3,7 @@
         "*.rmd": "markdown",
         "xstring": "cpp",
         "vector": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "limits": "cpp"
     }
 }

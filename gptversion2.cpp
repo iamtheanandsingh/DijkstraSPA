@@ -56,7 +56,10 @@ Node* findGateNode(vector<Node*>& nodes, string nodeName) {
     return nullptr;
 }
 
-int main() {
+int main(int agrc, int *argv[]) {
+
+    string fileName = agrv[1];
+    string  = agrv[2]; 
     // Declaring Variable for input
     string inputN, outputN, filename;
 
@@ -145,8 +148,8 @@ int main() {
 
     inputFile.close();
 
-    Node* sourceGate = findGateNode(nodes, inputN);
-    Node* destinationGate = findGateNode(nodes, outputN);
+    Node* sourceGate = findGateNode(nodes, argv[2]);
+    Node* destinationGate = findGateNode(nodes, argv[3]);
 
     if (sourceGate == nullptr) {
         cout << "Input Signal not found in " << filename << " file." << endl;
@@ -177,7 +180,9 @@ int main() {
     }
 
     priority_queue<pairNode, vector<pairNode>, function<bool(pairNode, pairNode)>> minHeap(
-        [](pairNode p1, pairNode p2) { return p1.weight > p2.weight; });
+        [](pairNode p1, pairNode p2) { 
+            return p1.weight > p2.weight; 
+            });
 
     sourceGate = findGateNode(nodes, inputN);
 
@@ -217,6 +222,5 @@ int main() {
     for (auto node : nodes) {
         delete node;
     }
-
     return 0;
 }
