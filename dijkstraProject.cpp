@@ -92,13 +92,13 @@ void buildGraphFromFile(const string& filePath, vector<Node*>& nodes) {
                 string innerString = " = ";
                 size_t index = input.find(innerString);
 
-                string intermediateGateName = input.substr(0, index);
+                string intermediateGate = input.substr(0, index);
                 string inputString = input.substr(index + innerString.length());
 
                 Node* node;
-                Node* currIntNode = findGateNode(nodes, intermediateGateName);
+                Node* currIntNode = findGateNode(nodes, intermediateGate);
                 if (currIntNode == nullptr) {
-                    node = new Node("INTERMEDIATE", 0, intermediateGateName);
+                    node = new Node("INTERMEDIATE", 0, intermediateGate);
                     nodes.push_back(node);
                 } else {
                     node = currIntNode;
