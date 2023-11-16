@@ -1,3 +1,7 @@
+//Using Older Approach For The Program:
+//Weight Of Incoming Edge To A Node = Number Of Outgoing Edges From That Node
+
+//Only Necessary Header Files
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -12,6 +16,7 @@
 
 using namespace std;
 
+// Node structure to store the Type, Name, Adjacency List and Node Delay
 struct Node {
     string type, name;
     list<Node*> adjacencyList;
@@ -127,29 +132,25 @@ void buildGraphFromFile(const string& filePath, vector<Node*>& nodes) {
     inputFile.close();
 }
 
-void dijkstraAlgorithm(vector<Node*>& nodes, Node* sourceGate, map<string, int>& nodeDelayDistance, map<string, string>& predecessors) {
-    priority_queue<pairNode, vector<pairNode>, function<bool(pairNode, pairNode)>> minHeap([](pairNode p1, pairNode p2) {
+void dijkstraAlgorithm(vector<Node*>& nodes, Node* sourceGate, map<string, int>& nodeDelayDistance, map<string, string>& pathNodes) {
+    priority_queue<pairNode, vector<pairNode>, function<bool(pairNode, pairNode)>> pqueue([](pairNode p1, pairNode p2) {
         return p1.weight > p2.weight;
     });
 
     nodeDelayDistance[sourceGate->name] = 0;
-    minHeap.push(pairNode(sourceGate, 0));
+    pqueue.push(pairNode(sourceGate, 0));
 
-    while (!minHeap.empty()) {
-        pairNode currentNode = minHeap.top();
-        minHeap.pop();
-        int dis;
-        dis = nodeDelayDistance[currentNode.gate->name];
-        if (currentNode.weight > dis) {
-            continue;
-        }
+    while (!pqueue.empty()) {
+        pairNode currentNode = pqueue.top();
+        pqueue.pop();
 
         for (auto& neighbour : currentNode.gate->adjacencyList) {
-            int newDistance = dis + findGateNode(nodes, neighbour->name)->nodeDelay;
-            if (newDistance < nodeDelayDistance[neighbour->name]) {
-                nodeDelayDistance[neighbour->name] = newDistance;
-                predecessors[neighbour->name] = currentNode.gate->name;
-                minHeap.push(pairNode(neighbour, newDistance));
+            int currentDistance = nodeDelayDistance[neighbour->name];
+            int freshDistance = nodeDelayDistance[currentNode.gate->name] + findGateNode(nodes, neighbour->name)->nodeDelay;
+            if(currentDistance > freshDistance) {
+                nodeDelayDistance[neighbour->name] = freshDistance;
+                pathNodes[neighbour->name] = currentNode.gate->name;
+                pqueue.push(pairNode(neighbour, freshDistance));
             }
         }
     }
@@ -162,6 +163,7 @@ void cleanupNodes(vector<Node*>& nodes) {
     }
 }
 
+//Main Function
 int main(int argc, char* argv[]) {
     //Check if there are 4 arguments including the file.
     if (argc != 4) {
@@ -214,20 +216,20 @@ int main(int argc, char* argv[]) {
 
     // Dijkstra Algorithm
     map<string, int> nodeDelayDistance;
-    map<string, string> predecessors;
+    map<string, string> pathNodes;
     for (const auto& vertex : nodes) {
         nodeDelayDistance[vertex->name] = numeric_limits<int>::max();
-        predecessors[vertex->name] = "";
+        pathNodes[vertex->name] = "";
     }
 
-    dijkstraAlgorithm(nodes, sourceGate, nodeDelayDistance, predecessors);
+    dijkstraAlgorithm(nodes, sourceGate, nodeDelayDistance, pathNodes);
 
     // Print the shortest distance from INPUT to OUTPUT
     int shortestDistance = nodeDelayDistance[findGateNode(nodes, outputN)->name];
     cout << "Shortest Distance from " << inputN << " to " << outputN << ": " << shortestDistance << endl;
 
     //Print the path from INPUT to OUTPUT
-    list<string> path = getPath(predecessors, findGateNode(nodes, outputN)->name);
+    list<string> path = getPath(pathNodes, findGateNode(nodes, outputN)->name);
     cout << "Path: ";
     for (const auto& vertex : path) {
         cout << vertex << "-> ";
